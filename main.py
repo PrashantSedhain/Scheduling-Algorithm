@@ -1,11 +1,10 @@
+import sys
 file = open("file.txt", "r")
 
 line = file.readline()
 splicedInput = line.split()
 pageFaults = 0
 pageFaultsLRU = 0
-lruCounter = 1
-inputForLRU = arrayOfInput = [[0, 0, 0], [0, 0, 0]]
 arrayOfInput = [0, 0, 0]
 arrayOfInput2 = [0, 0, 0]
 i = 0
@@ -37,6 +36,7 @@ for item in splicedInput:
         arrayOfInput[i] = item
         output = ""
         for element in arrayOfInput:
+            print(element)
             output = output + str(element) + " "
         print(output)
         i = i + 1
@@ -103,3 +103,54 @@ for item in splicedInput:
         i = i - 1
 
 print(("Pagefaults for LRU = " + str(pageFaultsLRU)))
+
+
+# --------------------------------------------------------#
+print("Calculating Optimal Scheduling: ")
+val = input("If you have table size type it! Otherwize it will default to 3!\n")
+if val:
+    TableSize = int(val)
+else:
+    TableSize = 3
+
+someList = splicedInput
+def get_farthest(index, memory):
+    last = 0
+    found = []
+    for item in someList[index:]:
+        if int(item) in memory:
+            if len(found) >= TableSize:
+                break
+            elif last == int(item):
+                continue
+            elif int(item) in found:
+                continue
+            else:
+                last = int(item)
+                found.append(int(item))
+        else:
+            continue
+    for item in memory:
+        if int(item) not in found:
+            found.append(int(item))           
+    return found[-1]
+
+def optimal(someList):
+    memory = []
+    pageFault = 0
+    for index, item in enumerate(someList):
+        if int(item) in memory:
+            print(memory)
+            continue
+        elif len(memory) >= TableSize:
+            pageFault = pageFault + 1
+            furthest = get_farthest(index, memory)
+            memory[memory.index(furthest)] = int(item)
+            print(memory)
+        else:
+            pageFault = pageFault + 1
+            memory.append(int(item))
+            print(memory)
+    return pageFault
+pageFault = optimal(someList)
+print(("Pagefaults for Optimal = " + str(pageFault)))
